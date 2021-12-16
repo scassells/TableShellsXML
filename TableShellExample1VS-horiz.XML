@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="TableShellDisplay.XSL"?>
+<TableShellDef TableOID="VS.SHIFT.01">
+    <!-- Assumptions: 
+        A single ADaM Variable  is used to define the Analysis Timepoints.  It muhst have a Codelist with one enumeratedItem per analysis timepoint.
+    
+    -->
+    <!-- TODO:Think about how to define Population descripton. 
+        THis version has 2 sets of results per column but only 2 rows. Each row has results for 1 visit but in this case the two visits have  different numbers of result columns. Will need to manage the column identifiers in the XSL -->
+    <!-- This is an example of a table display shell.  The goal for this example is to provide a generic XML structure that can support a DisplayStubContent.
+        Display Stub Content includes ColumnDefinitions with nesting, RowDefinitions with nesting and Cell Content Defintion. .-->
+    <!-- Added elements to describe results -->
+    <Header>
+        <Study ItemOID="ADSL.STUDYID"/>
+        <TitleBlock TableNumber="14.1.3.3.X.Y">
+            <Description>
+                <TranslatedText xml:lang="en">Summary of Observed and Change from Baseline by
+                    Scheduled Visits - Vital Signs</TranslatedText>
+            </Description>
+            <DocumentRef leadID="EX1.RTF.REF"/>
+            <AnalysisPopulationRef ApopRef="ANALYSIS.POP.CONDITION"/>
+        </TitleBlock>> <!-- Display would add page information  -->
+    </Header>
+    <ColDefs>
+        <!-- Each Column Header includes a reference to a treatement variable (concept) and a Result Row -->
+        <!-- Earlier example had a simplification but we want to leverage the ARDS work.
+            The TreatmentVariable Definition will define the values for the TX var in a codelist.  THe IncludeTotal attribute could trigger a flag to the analysis definition.
+            There is generall  
+        -->
+        <TreatmentVarRef ItemOID="ADVS.TRT01" IncludeTotal="Yes"/>
+        <ResultRef ResultOID="RD.HZ.ADVS.COL.RESULT"/> 
+        
+    </ColDefs>
+    <!-- Implementation Options: -->
+    <!--  1) ParameterDef defines the Parameter variable, TimingRef defines Timing variable and references a set of values, ResultGroupDef  -->
+    <RowDefs>
+        <ParameterRef ParamOID="VS.SHIFT.ADVS.PARAMCD"/>
+        <AnalysisTimepointRef ItemOID="ADVS.AVISIT"/>
+        <ResultGroupRef ResultGroupOID="ADVS.PARAM.AVAL.BASE"/>
+        <ResultGroupRef ResultGroupOID="ADVS.PARAM.AVAL.POSTBASELINE"/>
+    </RowDefs>
+    <ParameterDef OID="VS.SHIFT.ADVS.PARAMCD" Name="ADVS.PARAMCD">
+        <ItemRef ItemOID="ADVS.PARAMCD.SBP" OrderNumber="1"/>
+        <ItemRef ItemOID="ADVS.PARAMCD.DBP" OrderNumber="2"/>
+        <ItemRef ItemOID="ADVS.PARAMCD.WEIGHT" OrderNumbe="3"/>
+        <ItemDef ItemOID="ADVS.PARAMCD.HEIGHT" OrderNumber="4"/>
+    </ParameterDef>
+
+    <ResultGroupDef OID="ADVS.PARAM.AVAL.BASE">
+        <AnalysisTimepoint Name="Baseline"/>  // Should this be an ItemOID or, say, a where clause?
+        <AnalysisVariable ItemOID="ADVS.AVAL"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.COUNT" OrderNumber="1"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEAN.SD" OrderNumber="2"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEDIAN" OrderNumber="3"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.Q1.Q3" OrderNumber="4"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MIN.MAX" OrderNumber="5"/>
+    </ResultGroupDef>
+    <ResultGroupDef OID="ADVS.PARAM.AVAL.POSTBASELINE">
+        <!-- TODO:  Change to RowGroupDef? Update OID and the ResultGroupRefOID for any  ResultGroupRef  elements  to include a RG. prefix ?-->
+        <AnalysisTimepoint Name="Visit N"/>  // Should this be an ItemOID or, say, a where clause?
+        <AnalysisVariable ItemOID="ADVS.AVAL" OrderNumber="1"/>
+        <AnalysisVariable ItemOID="ADVS.CHG" OrderNumber="2"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.COUNT" OrderNumber="1"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEAN.SD" OrderNumber="2"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEDIAN" OrderNumber="3"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.Q1.Q3" OrderNumber="4"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MIN.MAX" OrderNumber="5"/>
+    </ResultGroupDef>
+    <CellContentDef OID="CCD.ADVS.PARAM.BASELINE" ResultGroupOID="ADVS.PARAM.AVAL.BASE"/>
+    <CellContentDef OID="CCD.ADVS.PARAM.POSTBASELINE" ResultGroupOID="ADVS.PARAM.AVAL.POSTBASELINE"/>
+    
+    <!--In the VS example, the Row Group and Cell Content for Post Baseline visits will have a different ResultGroupDefs-->
+    <ResultGroupDef OID="ADVS.PARAM.AVAL.VISITN">
+        <AnalysisTimepoint Name="n"/>
+        <AnalysisVariable ItemOID="ADVS.AVAL"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.COUNT"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEAN.SD"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEDIAN"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.Q1.Q3"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MIN.MAX"/>
+    </ResultGroupDef>
+    <ResultGroupDef OID="ADVS.PARAM.CHG.VISITN">
+        <AnalysisTimepoint Name="n"/>
+        <AnalysisVariable ItemOID="ADVS.CHG"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.COUNT"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEAN.SD"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEDIAN"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.Q1.Q3"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MIN.MAX"/>
+    </ResultGroupDef>
+    <ResultDef OID="RD.HZ.ADVS.COL.RESULT" Name="Trt-Col-Results" IsNested="Yes">
+        <ResultRef ResultOID="RD.ADVS.AVAL.RES.HDR" OrderNumber="1"/>
+        <ResultRef ResultOID="RD.ADVS.CHG.RES.HDR" OrderNumber="2"/> 
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.AVAL.RES.HDR" IsNested="No" Name="Observed">
+        <StatResultDef OID="SRD.ADVS.AVAL.COUNT" Name="Count">
+            <ResultLabel>N</ResultLabel>
+            <Format>XX</Format>
+        </StatResultDef>
+    </ResultDef>
+    <!-- The StatResultDef does not provide any information but should be extended to include Source using an element similar to the coded Item ODM element . THe value would need to be iadded as well but I would expect the value to be provided more or less at run time -->
+    <ResultDef Name="Change From Baseline" IsNested="No" OID="RD.ADVS.CHG.RES.HDR">
+        <StatResultDef OID="SRD.ADVS.CHG" Name="CHG">
+            <ResultLabel>N</ResultLabel>
+            <Format>XX</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.MEAN.SD" Name="Mean Std" IsNested="Yes">
+        <ResultRef ResultOID="RD.ADVS.PARAM.MEAN"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.SD"/>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.Q1.Q3" Name="Q1, Q3" IsNested="Yes">
+        <ResultRef ResultOID="RD.ADVS.PARAM.Q1"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.Q3"/>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.MIN.MAX" Name="Minimum, Maximum" IsNested="Yes">
+        <ResultRef ResultOID="RD.ADVS.PARAM.MIN"/>
+        <ResultRef ResultOID="RD.ADVS.PARAM.MAX"/>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.POP.COUNT" Name="NSUBJ" IsNested="No">
+        <StatResultDef OID="RD.ADVS.POP.COUNT">
+            <ResultLabel>N</ResultLabel>
+            <Format>XX</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.COUNT" Name="Count" IsNested="No">
+        <StatResultDef OID="SRD.ADVS.COUNT" Name="Count">
+            <ResultLabel>N</ResultLabel>
+            <Format>XX</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.COUNT" Name="Count" IsNested="No">
+        <StatResultDef OID="SRD.ADVS.PARAM.COUNT" Name="Count">
+            <ResultLabel>N</ResultLabel>> <Format>XX</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.MEAN" Name="Mean" IsNested="No">
+        <StatResultDef OID="SRD.ADVS.PARAM.MEAN" Name="MEAN">
+            <ResultLabel>Mean</ResultLabel>> <Format>XX.X</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.SD" Name="StDev" IsNested="No">
+        <StatResultDef OID="SRD.ADVS.PARAM.SD" Name="SD">
+            <ResultLabel>SD</ResultLabel>
+            <Format>(XX.XX)</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.MEDIAN" Name="Median" IsNested="No">
+        <StatResultDef OID="SRD.ADVS.PARAM.MEDIAN" Name="MEDIAN">
+            <ResultLabel>Median</ResultLabel>
+            <Format>XX.X</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.Q1" Name="Q1" IsNested="No">
+        <StatResultDef OID="ADVS.PARAM.Q1" Name="Q1">
+            <ResultLabel>Q1</ResultLabel>
+            <Format>XX.X,</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.Q3" Name="Q3" IsNested="No">
+        <StatResultDef OID="ADVS.PARAM.Q3" Name="Q3">
+            <ResultLabel>Q3</ResultLabel>
+            <Format> XX.X</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.MIN">
+        <StatResultDef OID="SRD.ADVS.PARAM.MIN" Name="MIN">
+            <ResultLabel>Min</ResultLabel>
+            <Format>XX.X,</Format>
+        </StatResultDef>
+    </ResultDef>
+    <ResultDef OID="RD.ADVS.PARAM.MAX">
+        <StatResultDef OID="SRD.ADVS.PARAM.MAX" Name="MAX">
+            <ResultLabel>Max</ResultLabel>
+            <Format> XX.X</Format>
+        </StatResultDef>
+    </ResultDef>
+    <leaf ID="EX1.RTF.REF">
+        <title>Overall Summary of Treatment Emergent Adverse Events</title>
+        <!-- use def:structure -->
+    </leaf>
+
+    <!-- A set of ItemDef elements are provided here for the POC. In an ADaM Standard definition, we would leverage the existing PARAMCD/PARAM structure but here the label description is part of the ParamCD definition. -->
+    <ItemDef OID="ADSL.STUDYID" Name="STUDYID" DataType="text"/>
+    <ItemDef OID="ADVS.TRT01" Name="TRT01" DataType="text">
+        <Description>
+            <TranslatedText xml:lang="en">Planned Treament</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.ADVS.TRTP"/>
+    </ItemDef>
+    <ItemDef OID="ADVS.AVISIT" Name="AVISIT" DataType="text">
+        <Description>
+            <TranslatedText xml:lang="en">Visit</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.SAFETY.TPList"/>
+    </ItemDef>
+    <ItemDef OID="ADVS.PARAMCD.SBP" Name="PARAMCD.SBP" DataType="text">
+        <Description>
+            <TranslatedText xml:lang="en">Systolic Blood Pressure in mmHg</TranslatedText>
+        </Description>
+    </ItemDef>
+    <ItemDef OID="ADVS.PARAMCD.DBP" Name="PARAMCD.DBP" DataType="text">
+        <Description>
+            <TranslatedText xml:lang="en">Diastloic Blood Pressure in mmHg</TranslatedText>
+        </Description>
+    </ItemDef>
+    <ItemDef OID="ADVS.PARAMCD.HEIGHT" Name="HEIGHT" DataType="float" Length="4"
+        SignificantDigits="1">
+        <Description>
+            <TranslatedText xml:lang="en">Height in cm</TranslatedText>
+        </Description>
+    </ItemDef>
+    <ItemDef OID="ADVS.PARAMCD.WEIGHT" Name="WEIGHT" DataType="float" Length="4"
+        SignificantDigits="1">
+        <Description>
+            <TranslatedText xml:lang="en">Weight in kg</TranslatedText>
+        </Description>
+    </ItemDef>
+    <ItemDef OID="ADVS.AVAL" Name="AVAL" DataType="float" Length="4" SignificantDigits="1">
+        <Description>
+            <TranslatedText xml:lang="en">Analysis Variable</TranslatedText>
+        </Description>
+    </ItemDef>
+    <ItemDef OID="ADVS.CHG" Name="CHG" DataType="float" Length="4" SignificantDigits="1">
+        <Description>
+            <TranslatedText xml:lang="en">Change from baseline</TranslatedText>
+        </Description>
+    </ItemDef>
+    <CodeList OID="CL.ADVS.TRTP" Name="TRTP" DataType="text">
+        <EnumeratedItem CodedValue="METFORMIN"/>
+        <EnumeratedItem CodedValue="HUMAN INSULIN"/>
+    </CodeList>
+    <CodeList OID="CL.SAFETY.TPList" Name="SAFETY-TIMEPOINTS" DataType="text">
+        <EnumeratedItem CodedValue="Baseline"/>
+        <EnumeratedItem CodedValue="Visit N"/>
+    </CodeList>
+
+</TableShellDef>

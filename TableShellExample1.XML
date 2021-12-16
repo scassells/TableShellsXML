@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TableShell>
+    <ID>TEAE.01</ID>
+    <Ordinal>1</Ordinal>
+    <Type>Table</Type>
+    <Name>TEAE-Overall</Name>
+    <Title>Overall Summary of Treatment Emergent Adverse Events</Title>
+    <Population>Safety Population</Population>
+    <ColDefs>
+        <TreatmentVar Name="TRT01" Num="4" StatOID="ST.01"/>
+        <ComputeCols>
+            <ComputeCol Name="Overall" StatOID="ST.01"/>
+        </ComputeCols>
+    </ColDefs>
+    <ResultGroupDef OID="EAE.01.GRP.01" OrderNumber="1">
+        <ResultRef ResultOID="TEAE.01.GRP.01.RES.01"/>
+        <ResultRef ResultOID="TEAE.01.GRP.01.RES.02"/>
+    </ResultGroupDef>
+    <ResultGroupDef OID="TEAE.01.GRP.02" OrderNumber="2">
+        <ResultRef ResultOID="TEAE.01.GRP.02.RES.01"/>
+    </ResultGroupDef>
+    <ResultDef OID="TEAE.01.GRP.01.RES.01">
+        <Label>Subjects with at least one AE</Label>
+        <StatResultRef StatResultOID="ST.01"/>
+        <StatResultRef StatResultOID="ST.02"/>
+    </ResultDef>
+    <ResultDef OID="TEAE.01.GRP.01.RES.02">
+        <Label>Subjects with a related AE</Label>
+        <StatResultRef StatResultOID="ST.01"/>
+        <StatResultRef StatResultOID="ST.02"/>
+    </ResultDef>
+    <ResultDef OID="TEAE.01.GRP.02.RES.01">
+        <Label>Number of AEs</Label>
+        <StatResultRef StatResultOID="ST.01"/>
+    </ResultDef>
+    <StatResultDef OID="ST.01" Name="N">
+        <Label>Number of Subjects</Label>
+        <Format>XX</Format>
+    </StatResultDef>
+    <StatResultDef OID="ST.02" Name="PCT">
+        <Label>Percentage of Subjects</Label>
+        <Format>(XX.X%)</Format>
+    </StatResultDef>
+</TableShell>
